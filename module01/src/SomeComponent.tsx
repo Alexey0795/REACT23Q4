@@ -1,23 +1,15 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
+import { ResultsSection } from './ResultsSection';
+import { OneResult } from './types';
 
-type OneResult = {
-  name: string;
-  rotation_period: number;
-  orbital_period: number;
-  diameter: number;
-  climate: string;
+type State = {
+  text: string;
+  planets: OneResult[];
 };
-
 class SomeComponent extends React.Component {
   state = {
     text: '',
-    info: {
-      name: '--',
-      rotation_period: '--',
-      orbital_period: '--',
-      diameter: '--',
-      climate: '--',
-    },
+    planets: [],
   };
 
   readStorage = () => {
@@ -27,14 +19,14 @@ class SomeComponent extends React.Component {
 
   writeStorage = () => {
     console.log('Write');
-    localStorage.setItem('searchText', JSON.stringify(this.state));
+    localStorage.setItem('searchText', JSON.stringify(this.state.text));
   };
 
-  getInfo = (id: number) => {
+  getInfo = () => {
     console.log('getInfo');
-    fetch(`https://swapi.dev/api/planets/${id}`)
+    fetch(`https://swapi.dev/api/planets/`)
       .then((res) => res.json())
-      .then((data) => this.setState({ info: data }));
+      .then((data) => this.setState({ planets: data.results }));
   };
 
   onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,8 +36,7 @@ class SomeComponent extends React.Component {
 
   onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     console.log('onFormSubmit');
-    event.preventDefault();
-    this.getInfo(+this.state.text);
+    event.preventDefault();    
   };
 
   clickHandle = () => {
@@ -61,12 +52,12 @@ class SomeComponent extends React.Component {
   componentDidUpdate() {
     console.log('Update');
     this.writeStorage();
-    console.log(this.state.info);
   }
 
   componentDidMount() {
     console.log('Mount');
-    this.getInfo(this.readStorage());
+    this.readStorage();
+    this.getInfo();
   }
 
   render() {
@@ -74,7 +65,7 @@ class SomeComponent extends React.Component {
 
     return (
       <>
-        <section className="search-bar">
+        <section id='frst' className="search-bar">
           <form id="aform" onSubmit={this.onFormSubmit}>
             <label id="afield">Search: </label>
             <input
@@ -87,12 +78,7 @@ class SomeComponent extends React.Component {
           </form>
         </section>
 
-        <section className="results card">
-          <p>name:{this.state.info.name}</p>
-          <p>orbital_period:{this.state.info.orbital_period}</p>
-          <p>climate:{this.state.info.climate}</p>
-          <p>rotation_period:{this.state.info.rotation_period}</p>
-        </section>
+        <ResultsSection planets={this.state.planets}/>
 
         <button onClick={this.clickHandle}>test err</button>
       </>
