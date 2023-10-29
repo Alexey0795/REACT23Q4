@@ -31,43 +31,48 @@ class SomeComponent extends React.Component {
   };
 
   getInfo = (id: number) => {
-    console.log('Get');
+    console.log('getInfo');
     fetch(`https://swapi.dev/api/planets/${id}`)
       .then((res) => res.json())
       .then((data) => this.setState({ info: data }));
   };
 
   onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('Event');
+    console.log('onInputChange');
     this.setState({ text: event.target.value });
   };
 
   onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    console.log('Subm');
+    console.log('onFormSubmit');
     event.preventDefault();
     this.getInfo(+this.state.text);
   };
 
   clickHandle = () => {
-    console.log('throwing');
+    console.log('Throw');
+    this.setState({ text: '-1' });
     throw new Error('Fake error');
   };
 
+  componentWillUnmount() {
+    this.writeStorage();
+  }
+
   componentDidUpdate() {
     console.log('Update');
-    //this.writeStorage();
+    this.writeStorage();
     console.log(this.state.info);
   }
 
   componentDidMount() {
     console.log('Mount');
-    this.readStorage();
+    this.getInfo(this.readStorage());
   }
 
   render() {
     console.log('Render');
 
-    return(
+    return (
       <>
         <section className="search-bar">
           <form id="aform" onSubmit={this.onFormSubmit}>
@@ -82,7 +87,7 @@ class SomeComponent extends React.Component {
           </form>
         </section>
 
-        <section className="results">
+        <section className="results card">
           <p>name:{this.state.info.name}</p>
           <p>orbital_period:{this.state.info.orbital_period}</p>
           <p>climate:{this.state.info.climate}</p>
