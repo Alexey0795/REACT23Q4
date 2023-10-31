@@ -8,10 +8,13 @@
     "build": "tsc && vite build",
     "lint": "tsc --noEmit && eslint ./src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format:fix": "prettier ./src --write",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "husky install"
   },
   "husky": {
-    "hooks": {}
+    "hooks": {
+      "pre-commit": "npm run format:fix && git add -A ."
+    }
   },
   "dependencies": {
     "react": "^18.2.0",

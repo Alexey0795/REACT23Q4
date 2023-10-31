@@ -3,74 +3,89 @@ import { ResultsSection } from './ResultsSection';
 import { OneResult } from './types';
 
 type State = {
-  text: string;
+  textInput: string;
   planets: OneResult[];
+  loading: boolean;
 };
-class SomeComponent extends React.Component {
+class SomeComponent extends React.Component<{}, State> {
   state = {
-    text: '',
+    textInput: '',
     planets: [],
+    loading: false,
   };
 
-  readStorage = () => {
+  readStorage = (): string => {
     console.log('Read');
-    return JSON.parse(localStorage.getItem('searchText') || '{}');
+    let value = localStorage.getItem('searchText') || false;
+    return value ? JSON.parse(value) : '';
   };
 
-  writeStorage = () => {
+  writeStorage = (): void => {
     console.log('Write');
-    localStorage.setItem('searchText', JSON.stringify(this.state.text));
+    localStorage.setItem('searchText', JSON.stringify(this.state.textInput));
   };
 
-  getInfo = () => {
-    console.log('getInfo');
-    fetch(`https://swapi.dev/api/planets/`)
+  getInfo = (params: string): void => {
+    console.log(`getInfo: ${params}`);
+    this.setState({ loading: true });
+    fetch(`https://swapi.dev/api/planets${params}`)
       .then((res) => res.json())
-      .then((data) => this.setState({ planets: data.results }));
+      .then((data) => {
+        this.setState({ planets: data.results, loading: false });
+      });
   };
 
-  onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('onInputChange');
-    this.setState({ text: event.target.value });
+  onInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    console.log(`onInputChange: ${event.target.value}`);
+    console.log(`change.this: ${this}`);
+    this.setState({ textInput: event.target.value });
+    console.log(`change.state.text.after: ${this.state.textInput}`);
   };
 
-  onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  onFormSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     console.log('onFormSubmit');
-    event.preventDefault();    
+    event.preventDefault();
+    this.writeStorage();
+    this.getInfo(`?search=${this.state.textInput}`);
   };
 
-  clickHandle = () => {
+  clickHandle = (): void => {
     console.log('Throw');
-    this.setState({ text: '-1' });
+    this.setState({ textInput: '-1' });
     throw new Error('Fake error');
   };
 
-  componentWillUnmount() {
-    this.writeStorage();
-  }
+  componentWillUnmount = () => {
+    console.log('WillUnmount');
+  };
 
-  componentDidUpdate() {
-    console.log('Update');
+  componentDidUpdate = () => {
+    console.log(`DidUpdate.state: ${this.state.textInput}`);
     this.writeStorage();
-  }
+  };
 
-  componentDidMount() {
-    console.log('Mount');
-    this.readStorage();
-    this.getInfo();
-  }
+  componentDidMount = () => {
+    console.log('DidMount');
+    let value = this.readStorage();
+    console.log(`mount.value: ${value}`);
+    if (value == '') {
+      this.getInfo('?page=1');
+    } else if (value !== '--') {
+      this.setState({ textInput: value });
+      this.getInfo(`?search=${value}`);
+    }
+  };
 
   render() {
     console.log('Render');
-
     return (
       <>
-        <section id='frst' className="search-bar">
+        <section id="frst" className="search-bar">
           <form id="aform" onSubmit={this.onFormSubmit}>
             <label id="afield">Search: </label>
             <input
               type="text"
-              value={this.state.text}
+              value={this.state.textInput}
               onChange={this.onInputChange}
               placeholder="id"
             />
@@ -78,8 +93,9 @@ class SomeComponent extends React.Component {
           </form>
         </section>
 
-        <ResultsSection planets={this.state.planets}/>
+        {this.state.loading && <p>Loading...</p>}
 
+        <ResultsSection planets={this.state.planets} />
         <button onClick={this.clickHandle}>test err</button>
       </>
     );
