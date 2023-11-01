@@ -7,7 +7,7 @@ type State = {
   planets: OneResult[];
   loading: boolean;
 };
-class SomeComponent extends React.Component<{}, State> {
+class SomeComponent extends React.Component<unknown, State> {
   state = {
     textInput: '',
     planets: [],
@@ -16,7 +16,7 @@ class SomeComponent extends React.Component<{}, State> {
 
   readStorage = (): string => {
     console.log('Read');
-    let value = localStorage.getItem('searchText') || false;
+    const value = localStorage.getItem('searchText') || false;
     return value ? JSON.parse(value) : '';
   };
 
@@ -66,7 +66,7 @@ class SomeComponent extends React.Component<{}, State> {
 
   componentDidMount = () => {
     console.log('DidMount');
-    let value = this.readStorage();
+    const value = this.readStorage();
     console.log(`mount.value: ${value}`);
     if (value == '') {
       this.getInfo('?page=1');

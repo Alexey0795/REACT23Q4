@@ -12,7 +12,7 @@ export class ResultsSection extends Component<Props> {
       <section id="scnd">
         <ul className="list">
           {this.props.planets.map((planetData) => (
-            <Planet info={planetData} />
+            <Planet key={planetData.name} info={planetData} />
           ))}
         </ul>
       </section>
