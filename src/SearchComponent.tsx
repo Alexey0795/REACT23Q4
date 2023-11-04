@@ -1,105 +1,81 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
+import { Outlet } from 'react-router-dom';
 import { ResultsSection } from './ResultsSection';
 import { OneResult } from './types';
 
-type State = {
-  textInput: string;
-  planets: OneResult[];
-  loading: boolean;
-};
-class SomeComponent extends React.Component<unknown, State> {
-  state = {
-    textInput: '',
-    planets: [],
-    loading: false,
-  };
+export function SearchComponent() {
+  const [textInput, setTextInput] = useState<string>('');
+  const [planets, setPlanets] = useState<OneResult[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  readStorage = (): string => {
-    console.log('Read');
-    const value = localStorage.getItem('searchText') || false;
-    return value ? JSON.parse(value) : '';
-  };
+  useEffect(() => {
+    let value: string = localStorage.getItem('searchText') || '';
+    value = value ? JSON.parse(value) : '';
 
-  writeStorage = (): void => {
-    console.log('Write');
-    localStorage.setItem('searchText', JSON.stringify(this.state.textInput));
-  };
+    setTextInput(value);
+    setLoading(true);
+    getInfo(value);
+    setLoading(false);
+  }, []);
 
-  getInfo = (params: string): void => {
+  const getInfo = (value: string): void => {
+    let params: string = '';
+
+    if (value == '') {
+      params = '?page=1';
+    } else if (value !== '--') {
+      params = `?search=${value}`;
+    }
+
     console.log(`getInfo: ${params}`);
-    this.setState({ loading: true });
     fetch(`https://swapi.dev/api/planets${params}`)
       .then((res) => res.json())
       .then((data) => {
-        this.setState({ planets: data.results, loading: false });
+        setPlanets(data.results);
       });
   };
 
-  onInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    console.log(`onInputChange: ${event.target.value}`);
-    console.log(`change.this: ${this}`);
-    this.setState({ textInput: event.target.value });
-    console.log(`change.state.text.after: ${this.state.textInput}`);
+  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    setTextInput(event.target.value);
   };
 
-  onFormSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
-    console.log('onFormSubmit');
+  const onFormSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    this.writeStorage();
-    this.getInfo(`?search=${this.state.textInput}`);
+    localStorage.setItem('searchText', JSON.stringify(textInput));
+    getInfo(textInput);
   };
 
-  clickHandle = (): void => {
+  const onClickError = (): void => {
     console.log('Throw');
-    this.setState({ textInput: '-1' });
     throw new Error('Fake error');
   };
 
-  componentWillUnmount = () => {
-    console.log('WillUnmount');
-  };
+  console.log('Render');
+  return (
+    <>
+      <section id="frst" className="search-bar">
+        <button onClick={onClickError}>test err</button>
 
-  componentDidUpdate = () => {
-    console.log(`DidUpdate.state: ${this.state.textInput}`);
-    this.writeStorage();
-  };
+        <form id="aform" onSubmit={onFormSubmit}>
+          <label id="afield">Search: </label>
+          <input
+            type="text"
+            value={textInput}
+            onChange={onInputChange}
+            placeholder="id"
+          />
+          <button type="submit">Find</button>
+        </form>
+      </section>
 
-  componentDidMount = () => {
-    console.log('DidMount');
-    const value = this.readStorage();
-    console.log(`mount.value: ${value}`);
-    if (value == '') {
-      this.getInfo('?page=1');
-    } else if (value !== '--') {
-      this.setState({ textInput: value });
-      this.getInfo(`?search=${value}`);
-    }
-  };
+      {loading && <p>Loading...</p>}
 
-  render() {
-    console.log('Render');
-    return (
-      <>
-        <section id="frst" className="search-bar">
-          <form id="aform" onSubmit={this.onFormSubmit}>
-            <label id="afield">Search: </label>
-            <input
-              type="text"
-              value={this.state.textInput}
-              onChange={this.onInputChange}
-              placeholder="id"
-            />
-            <button type="submit">Find</button>
-          </form>
-        </section>
+      <section id="scnd">
+        <ResultsSection planets={planets} />
+      </section>
 
-        {this.state.loading && <p>Loading...</p>}
-
-        <ResultsSection planets={this.state.planets} />
-        <button onClick={this.clickHandle}>test err</button>
-      </>
-    );
-  }
+      <Outlet />
+    </>
+  );
 }
-
-export default SomeComponent;
