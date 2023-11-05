@@ -1,12 +1,11 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { ResultsSection } from './ResultsSection';
-import { OneResult } from './types';
+import { PlanetInfo } from './PlanetPage';
 
 export function SearchComponent() {
   const [textInput, setTextInput] = useState<string>('');
-  const [planets, setPlanets] = useState<OneResult[]>([]);
+  const [planets, setPlanets] = useState<PlanetInfo[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -53,29 +52,35 @@ export function SearchComponent() {
 
   console.log('Render');
   return (
-    <>
-      <section id="frst" className="search-bar">
-        <button onClick={onClickError}>test err</button>
+    <div id="app-container">
+      <div id="side-left">
+        <section id="frst" className="search-bar">
+          <button className="errbtn" onClick={onClickError}>
+            test err
+          </button>
 
-        <form id="aform" onSubmit={onFormSubmit}>
-          <label id="afield">Search: </label>
-          <input
-            type="text"
-            value={textInput}
-            onChange={onInputChange}
-            placeholder="id"
-          />
-          <button type="submit">Find</button>
-        </form>
-      </section>
+          <form id="aform" onSubmit={onFormSubmit}>
+            <label id="afield">Search: </label>
+            <input
+              type="text"
+              value={textInput}
+              onChange={onInputChange}
+              placeholder="id"
+            />
+            <button type="submit">Find</button>
+          </form>
+        </section>
 
-      {loading && <p>Loading...</p>}
+        {loading && <p>Loading...</p>}
 
-      <section id="scnd">
-        <ResultsSection planets={planets} />
-      </section>
+        <section id="scnd">
+          <ResultsSection planets={planets} />
+        </section>
+      </div>
 
-      <Outlet />
-    </>
+      <div id="side-right">
+        <Outlet />
+      </div>
+    </div>
   );
 }

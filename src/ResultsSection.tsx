@@ -1,7 +1,8 @@
-import { OneResult } from './types.ts';
+import { Link } from 'react-router-dom';
+import { PlanetInfo } from './PlanetPage';
 
 type Props = {
-  planets: OneResult[];
+  planets: PlanetInfo[];
 };
 
 export function ResultsSection(props: Props) {
@@ -9,10 +10,8 @@ export function ResultsSection(props: Props) {
     <ul className="list">
       {props.planets.map((planetData) => (
         <li key={planetData.name} id={planetData.name} className="card">
-          <p>name:{planetData.name}</p>
-          <p>climate:{planetData.climate}</p>
-          <p>orbital_period:{planetData.orbital_period}</p>
-          <p>rotation_period:{planetData.rotation_period}</p>
+          <span>{planetData.name}</span>
+          <Link to={`planets/${planetData.name}`}>{'>>>'}</Link>
         </li>
       ))}
     </ul>

@@ -12,7 +12,7 @@ import { PlanetPage } from './PlanetPage.tsx';
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<SearchComponent />}>
-      <Route path="planets/:id" element={<PlanetPage />} />
+      <Route path="planets/:name" element={<PlanetPage />} />
       <Route path="*" element={<h1>404 Not found</h1>} />
     </Route>
   )
