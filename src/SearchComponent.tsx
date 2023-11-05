@@ -42,7 +42,9 @@ export function SearchComponent() {
   const onFormSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     localStorage.setItem('searchText', JSON.stringify(textInput));
+    setLoading(true);
     getInfo(textInput);
+    setLoading(false);
   };
 
   const onClickError = (): void => {
