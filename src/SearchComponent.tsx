@@ -9,13 +9,13 @@ export function SearchComponent() {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log('Effect');
     let value: string = localStorage.getItem('searchText') || '';
     value = value ? JSON.parse(value) : '';
 
     setTextInput(value);
     setLoading(true);
     getInfo(value);
-    setLoading(false);
   }, []);
 
   const getInfo = (value: string): void => {
@@ -27,11 +27,12 @@ export function SearchComponent() {
       params = `?search=${value}`;
     }
 
-    console.log(`getInfo: ${params}`);
     fetch(`https://swapi.dev/api/planets${params}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log(`list.resp: ${data}`);
         setPlanets(data.results);
+        setLoading(false);
       });
   };
 
@@ -44,7 +45,6 @@ export function SearchComponent() {
     localStorage.setItem('searchText', JSON.stringify(textInput));
     setLoading(true);
     getInfo(textInput);
-    setLoading(false);
   };
 
   const onClickError = (): void => {

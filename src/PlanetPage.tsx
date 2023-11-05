@@ -27,7 +27,7 @@ export function PlanetPage() {
     fetch(`https://swapi.dev/api/planets?search=${name}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(`data.res: ${data.results[0]}`);
+        console.log(`planet.resp: ${data.results[0]}`);
         setplanetData(data.results[0]);
         setLoading(false);
       });
