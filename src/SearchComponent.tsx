@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { ResultsSection } from './ResultsSection';
 import { PlanetInfo } from './PlanetPage';
+import { PaginationComponent } from './PaginationComponent';
 
 export function SearchComponent() {
   const [textInput, setTextInput] = useState<string>('');
   const [planets, setPlanets] = useState<PlanetInfo[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [, setError] = useState<Error>();
 
   useEffect(() => {
     console.log('Effect');
@@ -49,7 +51,7 @@ export function SearchComponent() {
 
   const onClickError = (): void => {
     console.log('Throw');
-    throw new Error('Fake error');
+    setError(new Error('Fake error'));
   };
 
   console.log('Render');
@@ -72,6 +74,8 @@ export function SearchComponent() {
             <button type="submit">Find</button>
           </form>
         </section>
+
+        <PaginationComponent />
 
         {loading && <p>Loading...</p>}
 

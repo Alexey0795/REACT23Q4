@@ -24,7 +24,7 @@ export function PlanetPage() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`https://swapi.dev/api/planets?search=${name}`)
+    fetch(`https://swapi.dev/api/planets?name=${name}`)
       .then((res) => res.json())
       .then((data) => {
         console.log(`planet.resp: ${data.results[0]}`);
